@@ -1,6 +1,5 @@
 import asyncio
 
-import time
 import curses
 from itertools import cycle
 
@@ -110,9 +109,7 @@ async def animate_spaceship(canvas, polys):
             start_row = max(min(frame_row_max, field_row_max) - frame_size_row, border_size)
 
             draw_frame(canvas, start_row, start_column, current_frame)
-            canvas.refresh()
             await asyncio.sleep(0)
-            time.sleep(0.07)
 
             draw_frame(canvas, start_row, start_column, current_frame, negative=True)
             current_frame = next(iterator)

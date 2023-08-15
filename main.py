@@ -8,8 +8,10 @@ from os import path
 
 from animation import get_frame_size, animate_spaceship
 
+TIC_TIMEOUT = 0.1
 
-def frame(filename):
+
+def read_frame(filename):
     with open(filename, 'r') as frame1:
         file = frame1.read()
     return file
@@ -44,23 +46,18 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
 
 
 async def blink(canvas, row, column, symbol='*'):
-    TIC_TIMEOUT = 0.002
     while True:
-        time.sleep(TIC_TIMEOUT)
         canvas.addstr(row, column, symbol, curses.A_DIM)
         for _ in range(20):
             await asyncio.sleep(0)
-        time.sleep(TIC_TIMEOUT)
 
         canvas.addstr(row, column, symbol)
         for _ in range(30):
             await asyncio.sleep(0)
-        time.sleep(TIC_TIMEOUT)
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
         for _ in range(50):
             await asyncio.sleep(0)
-        time.sleep(TIC_TIMEOUT)
 
         canvas.addstr(row, column, symbol)
         for _ in range(30):
@@ -78,13 +75,13 @@ def draw(canvas):
     file_name_1 = path.realpath('frames/rocket_frame_1.txt')
     file_name_2 = path.realpath('frames/rocket_frame_2.txt')
 
-    frame_1 = frame(file_name_1)
-    frame_2 = frame(file_name_2)
+    frame_1 = read_frame(file_name_1)
+    frame_2 = read_frame(file_name_2)
 
     polys = [frame_1, frame_2]
 
     borders_size = 1
-    correct_for_fire = 2
+    correct_for_fire = 3
     max_row, max_column = rows - borders_size, columns + correct_for_fire
 
     spaceship_rows_for_fire, spaceship_columns_for_fire = get_frame_size(frame_1)
@@ -102,7 +99,6 @@ def draw(canvas):
     animate_space = animate_spaceship(canvas, polys)
     coroutines.append(animate_space)
 
-    TIC_TIMEOUT = 0.1
     while True:
         for coroutine in coroutines.copy():
             try:
