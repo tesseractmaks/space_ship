@@ -67,6 +67,7 @@ async def blink(canvas, row, column, symbol='*'):
 def draw(canvas):
     canvas.border()
     curses.curs_set(False)
+    canvas.nodelay(True)
     stdscr = initscr()
     rows, columns = stdscr.getmaxyx()
     random.randint(1, rows)
@@ -106,6 +107,7 @@ def draw(canvas):
                 canvas.refresh()
             except StopIteration:
                 coroutines.remove(coroutine)
+                canvas.refresh()
         time.sleep(TIC_TIMEOUT)
 
 

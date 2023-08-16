@@ -1,6 +1,5 @@
 import asyncio
 
-import curses
 from itertools import cycle
 
 SPACE_KEY_CODE = 32
@@ -72,9 +71,6 @@ def get_frame_size(text):
 
 async def animate_spaceship(canvas, polys):
     rows, columns = canvas.getmaxyx()
-    canvas.border()
-    curses.curs_set(False)
-    canvas.nodelay(True)
 
     iterator = cycle(polys)
     current_frame = next(iterator)
