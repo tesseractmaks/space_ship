@@ -2,6 +2,8 @@ import asyncio
 
 from itertools import cycle
 
+from physics import update_speed
+
 SPACE_KEY_CODE = 32
 LEFT_KEY_CODE = 260
 RIGHT_KEY_CODE = 261
@@ -88,12 +90,24 @@ async def animate_spaceship(canvas, polys):
     border_size = 1
     frame_size_row, frame_size_column = get_frame_size(current_frame)
 
+    row_speed, column_speed = 0, 0
+
     while True:
         for _ in range(2):
             direction_y, direction_x, _ = read_controls(canvas)
 
-            current_column += direction_x
-            current_row += direction_y
+            row_speed, column_speed = update_speed(
+                row_speed,
+                column_speed,
+                direction_y,
+                direction_x
+            )
+
+            current_column += column_speed
+            current_row += row_speed
+
+            # current_column += direction_x
+            # current_row += direction_y
 
             frame_column_max = current_column + frame_size_column
             frame_row_max = current_row + frame_size_row
