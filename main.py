@@ -18,6 +18,12 @@ def read_frame(filename):
     return file
 
 
+async def sleep(tics=1):
+    iteration_count = int(tics * 10)
+    for _ in range(iteration_count):
+        await asyncio.sleep(0)
+
+
 async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
     row, column = start_row, start_column
 
@@ -82,7 +88,7 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
         canvas.border()
 
 
-async def fill_orbit_with_garbage(canvas, coroutines, garbage_frames):
+async def fill_orbit_with_garbage(canvas, coroutines, garbage_frames, timeout=1):
     border_size = 1
     _, columns_number = canvas.getmaxyx()
 
@@ -108,24 +114,8 @@ async def fill_orbit_with_garbage(canvas, coroutines, garbage_frames):
         garbage_coro = fly_garbage(canvas, actual_column, current_trash_frame)
         coroutines.append(garbage_coro)
 
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
-        await asyncio.sleep(0)
+        await sleep(timeout)
+
 
 
 def multiple_frames():
