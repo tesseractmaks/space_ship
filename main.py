@@ -6,8 +6,7 @@ import curses
 import random
 from os import path
 
-from animation import animate_spaceship, draw_frame, get_frame_size
-
+from animation import animate_spaceship, draw_frame, get_frame_size, fire
 
 TIC_TIMEOUT = 0.1
 
@@ -24,32 +23,7 @@ async def sleep(tics=1):
         await asyncio.sleep(0)
 
 
-async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
-    row, column = start_row, start_column
 
-    canvas.addstr(round(row), round(column), '*')
-    await asyncio.sleep(0)
-
-    canvas.addstr(round(row), round(column), 'O')
-    await asyncio.sleep(0)
-    canvas.addstr(round(row), round(column), ' ')
-
-    row += rows_speed
-    column += columns_speed
-
-    symbol = '-' if columns_speed else '|'
-
-    rows, columns = canvas.getmaxyx()
-    max_row, max_column = rows, columns
-
-    curses.beep()
-
-    while 1 < row < max_row and 1 < column < max_column:
-        canvas.addstr(round(row), round(column), symbol)
-        await asyncio.sleep(0)
-        canvas.addstr(round(row), round(column), ' ')
-        row += rows_speed
-        column += columns_speed
 
 
 async def blink(canvas, row, column, symbol='*'):
@@ -117,7 +91,6 @@ async def fill_orbit_with_garbage(canvas, coroutines, garbage_frames, timeout=1)
         await sleep(timeout)
 
 
-
 def multiple_frames():
     trash_large = path.realpath('frames/trash_large.txt')
     trash_small = path.realpath('frames/trash_small.txt')
@@ -173,7 +146,7 @@ def draw(canvas):
     for _ in range(200):
         coroutines.append(
             blink(canvas, random.randint(1, rows - 2), random.randint(1, columns - 2), symbol=random.choice('+*.:')))
-    animate_space = animate_spaceship(canvas, polys)
+    animate_space = animate_spaceship(canvas, polys, coroutines)
     coroutines.append(animate_space)
 
     garbage_frames = multiple_frames()

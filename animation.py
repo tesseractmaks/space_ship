@@ -1,7 +1,7 @@
 import asyncio
-
+from os import path
 from itertools import cycle
-
+import curses
 from physics import update_speed
 
 SPACE_KEY_CODE = 32
@@ -64,6 +64,12 @@ def draw_frame(canvas, start_row, start_column, text, negative=False):
             canvas.addch(row, column, symbol)
 
 
+def read_frame(filename):
+    with open(filename, 'r') as frame1:
+        file = frame1.read()
+    return file
+
+
 def get_frame_size(text):
     lines = text.splitlines()
     rows = len(lines)
@@ -71,13 +77,42 @@ def get_frame_size(text):
     return rows, columns
 
 
-async def animate_spaceship(canvas, polys):
+async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
+    row, column = start_row, start_column
+
+    canvas.addstr(round(row), round(column), '*')
+    await asyncio.sleep(0)
+
+    canvas.addstr(round(row), round(column), 'O')
+    await asyncio.sleep(0)
+    canvas.addstr(round(row), round(column), ' ')
+
+    row += rows_speed
+    column += columns_speed
+
+    symbol = '-' if columns_speed else '|'
+
+    rows, columns = canvas.getmaxyx()
+    max_row, max_column = rows, columns
+
+    curses.beep()
+
+    while 1 < row < max_row and 1 < column < max_column:
+        canvas.addstr(round(row), round(column), symbol)
+        await asyncio.sleep(0)
+        canvas.addstr(round(row), round(column), ' ')
+        row += rows_speed
+        column += columns_speed
+
+
+async def animate_spaceship(canvas, polys, coroutines):
     rows, columns = canvas.getmaxyx()
 
     iterator = cycle(polys)
     current_frame = next(iterator)
 
     borders_size = 1
+
     max_row, max_column = rows - borders_size, columns - borders_size
 
     spaceship_rows, spaceship_columns = get_frame_size(current_frame)
@@ -88,13 +123,34 @@ async def animate_spaceship(canvas, polys):
 
     height, width = canvas.getmaxyx()
     border_size = 1
+
+
+
     frame_size_row, frame_size_column = get_frame_size(current_frame)
 
     row_speed, column_speed = 0, 0
 
     while True:
         for _ in range(2):
-            direction_y, direction_x, _ = read_controls(canvas)
+            direction_y, direction_x, shot = read_controls(canvas)
+
+            file_name_1 = path.realpath('frames/rocket_frame_1.txt')
+            frame_1 = read_frame(file_name_1)
+            correct_for_fire = 2
+
+
+            spaceship_rows_for_fire, spaceship_columns_for_fire = get_frame_size(frame_1)
+
+            frame_pos_x = current_column - spaceship_columns_for_fire / 2 + correct_for_fire
+            frame_pos_y = current_row - spaceship_rows_for_fire / 2
+
+            if shot:
+                shot_pos_x = frame_pos_x + spaceship_columns_for_fire / 2
+                shot_pos_y = frame_pos_y + correct_for_fire * 2
+
+                coroutine_fire = fire(canvas, shot_pos_y, shot_pos_x, rows_speed=-0.3, columns_speed=0)
+
+                coroutines.append(coroutine_fire)
 
             row_speed, column_speed = update_speed(
                 row_speed,
@@ -106,8 +162,6 @@ async def animate_spaceship(canvas, polys):
             current_column += column_speed
             current_row += row_speed
 
-            # current_column += direction_x
-            # current_row += direction_y
 
             frame_column_max = current_column + frame_size_column
             frame_row_max = current_row + frame_size_row
