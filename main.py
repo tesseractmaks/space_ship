@@ -12,7 +12,7 @@ from physics import update_speed
 
 from curses_tools import draw_frame, read_controls
 
-from space_garbage import fly_garbage, obstacles_actual
+from space_garbage import fly_garbage
 
 
 TIC_TIMEOUT = 0.1
@@ -49,56 +49,11 @@ async def blink(canvas, row, column, symbol='*'):
             await asyncio.sleep(0)
 
 
-# async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
-#     """Animate garbage, flying from top to bottom. Сolumn position will stay same, as specified on start."""
-#     rows_number, columns_number = canvas.getmaxyx()
-#
-#     column = max(column, 0)
-#     column = min(column, columns_number - 1)
-#
-#     row = 0
-#
-#     while row < rows_number:
-#         draw_frame(canvas, row, column, garbage_frame)
-#         await asyncio.sleep(0)
-#         draw_frame(canvas, row, column, garbage_frame, negative=True)
-#         row += speed
-#         canvas.border()
-
-
-# async def fill_orbit_with_garbage(canvas, coroutines, garbage_frames, timeout=1):
-#     border_size = 1
-#     _, columns_number = canvas.getmaxyx()
-#
-#     while True:
-#         file_name = random.choice(garbage_frames)
-#
-#         current_trash_frame = read_frame(file_name)
-#
-#         _, trash_column_size = get_frame_size(current_trash_frame)
-#
-#         _, columns_number = canvas.getmaxyx()
-#
-#         random_column = random.randint(
-#             border_size,
-#             columns_number - trash_column_size - border_size
-#         )
-#
-#         actual_column = min(
-#             columns_number - trash_column_size - border_size,
-#             random_column + trash_column_size - border_size,
-#         )
-#
-#         garbage_coro = fly_garbage(canvas, actual_column, current_trash_frame)
-#         coroutines.append(garbage_coro)
-#
-#         await sleep(timeout)
 def get_frame_size(text):
     lines = text.splitlines()
     rows = len(lines)
     columns = max([len(line) for line in lines])
     return rows, columns
-
 
 async def fill_orbit_with_garbage(canvas, coroutines, garbage_frames):
     border_size = 1
@@ -112,7 +67,6 @@ async def fill_orbit_with_garbage(canvas, coroutines, garbage_frames):
         _, trash_column_size = get_frame_size(current_trash_frame)
 
         _, columns_number = canvas.getmaxyx()
-
 
         random_column = random.randint(
             border_size,
